@@ -1,46 +1,51 @@
-<script setup lang="ts" generic="T extends any, O extends any">
-defineOptions({
-  name: 'IndexPage',
+<script setup lang="ts">
+import { Map as Mapl, NavigationControl } from "maplibre-gl"
+import { onMapLoad } from "~/composables/maplibre-helper/onMapLoad"
+import { addRasterLayer } from "~/composables/maplibre-helper/addRasterLayer"
+
+const mapId = "map-index"
+const map = shallowRef<Mapl>()
+
+onMounted(async () => {
+  map.value = new Mapl({
+    container: mapId,
+    style: {
+      version: 8,
+      center: [117.2, -3.2],
+      zoom: 4,
+      layers: [],
+      sources: {},
+      glyphs: "https://fontstack-pbf.supermap.id/{fontstack}/{range}.pbf"
+    },
+    antialias: true,
+    preserveDrawingBuffer: true
+  })
+
+  map.value.addControl(
+    new NavigationControl({
+      visualizePitch: true
+    }),
+    "bottom-right"
+  )
+
+  await onMapLoad(map.value)
+
+  addRasterLayer({
+    map: map.value,
+    urls: ["https://tiles.supermap.id/styles/positron/{z}/{x}/{y}.png"],
+    spec: {
+      type: "raster"
+    }
+  })
 })
-
-const name = ref('')
-
-const router = useRouter()
-function go() {
-  if (name.value)
-    router.push(`/hi/${encodeURIComponent(name.value)}`)
-}
 </script>
 
 <template>
-  <div>
-    <div i-carbon-campsite inline-block text-4xl />
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse-lite" target="_blank">
-        Vitesse Lite
-      </a>
-    </p>
-    <p>
-      <em text-sm op75>Opinionated Vite Starter Template</em>
-    </p>
-
-    <div py-4 />
-
-    <TheInput
-      v-model="name"
-      placeholder="What's your name?"
-      autocomplete="false"
-      @keydown.enter="go"
-    />
-
-    <div>
-      <button
-        class="m-3 text-sm btn"
-        :disabled="!name"
-        @click="go"
-      >
-        Go
-      </button>
-    </div>
+  <div id="container" class="absolute w-full h-full">
+    <div id="map-index" class="map w-full h-full" style="left: 0; top: 0; background-color: #d4dadc"></div>
   </div>
 </template>
+
+<style>
+@import "maplibre-gl/dist/maplibre-gl.css";
+</style>

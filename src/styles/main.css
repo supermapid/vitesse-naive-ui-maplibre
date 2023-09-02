@@ -1,11 +1,6 @@
-html,
-body,
-#app {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+@import url("./color.css");
+@import url("./font.css");
 
-html.dark {
-  background: #121212;
+body {
+  font-family: "Poppins", sans-serif;
 }
